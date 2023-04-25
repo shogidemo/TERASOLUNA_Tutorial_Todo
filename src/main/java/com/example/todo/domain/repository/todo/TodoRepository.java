@@ -8,7 +8,7 @@ import com.example.todo.domain.model.Todo;
 public interface TodoRepository {
 	Optional<Todo> findById(String todoId);
 	
-	Collection<Todo> finrdAll();
+	Collection<Todo> findAll();
 	
 	void create(Todo todo);
 	

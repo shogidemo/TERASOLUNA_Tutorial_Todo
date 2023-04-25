@@ -28,7 +28,7 @@ public class TodoServiceImpl implements TodoService {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<Todo> findAll() {
-		return todoRepository.finrdAll();
+		return todoRepository.findAll();
 	}
 
 	@Override
@@ -48,6 +48,8 @@ public class TodoServiceImpl implements TodoService {
 		todo.setTodoId(todoId);
 		todo.setCreatedAt(createdAt);
 		todo.setFinished(false);
+		
+		todoRepository.create(todo);
 		
 		return todo;
 	}

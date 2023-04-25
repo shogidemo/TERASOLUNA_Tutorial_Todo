@@ -19,7 +19,7 @@ public class TodoRepositoryImpl implements TodoRepository {
 	}
 
 	@Override
-	public Collection<Todo> finrdAll() {
+	public Collection<Todo> findAll() {
 		return TODO_MAP.values();
 	}
 
