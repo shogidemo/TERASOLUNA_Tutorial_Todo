@@ -1,12 +1,15 @@
 package com.example.todo.domain.service.todo;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.terasoluna.gfw.common.exception.BusinessException;
+import org.terasoluna.gfw.common.exception.ResourceNotFoundException;
 import org.terasoluna.gfw.common.message.ResultMessage;
 import org.terasoluna.gfw.common.message.ResultMessages;
 
@@ -30,6 +33,8 @@ public class TodoServiceImpl implements TodoService {
 
 	@Override
 	public Todo create(Todo todo) {
+		
+		//Todoが作成可能かチェックする
 		long unfinishedCount = todoRepository.countByFinished(false);
 		if (unfinishedCount >= MAX_UNFINISHED_COUNT) {
 			ResultMessages messages = ResultMessages.error();
@@ -37,19 +42,43 @@ public class TodoServiceImpl implements TodoService {
 			throw new BusinessException(messages);
 		}
 		
-		String todoId = randomUUID().toString();
+		String todoId = UUID.randomUUID().toString();
+		Date createdAt = new Date();
+		
+		todo.setTodoId(todoId);
+		todo.setCreatedAt(createdAt);
+		todo.setFinished(false);
+		
+		return todo;
 	}
 
 	@Override
 	public Todo finish(String todoId) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		Todo todo = findOne(todoId);
+		if (todo.isFinished()) {
+			ResultMessages messages = ResultMessages.error();
+			messages.add(ResultMessage.fromText("[E002] The requested Todo is already finished. (id=" + todoId + ")"));
+			throw new BusinessException(messages);
+		}
+		
+		todo.setFinished(true);
+		todoRepository.update(todo);
+		
+		return todo;
 	}
 
 	@Override
 	public void delete(String todoId) {
-		// TODO 自動生成されたメソッド・スタブ
-
+		Todo todo = findOne(todoId);
+		todoRepository.delete(todo);
+	}
+	
+	private Todo findOne(String todoId) {
+		return todoRepository.findById(todoId).orElseThrow(() -> {
+			ResultMessages messages = ResultMessages.error();
+			messages.add(ResultMessage.fromText("[E404] The requested Todo is not found. (id=" + todoId + ")"));
+			return new ResourceNotFoundException(messages);
+		});
 	}
 
 }
