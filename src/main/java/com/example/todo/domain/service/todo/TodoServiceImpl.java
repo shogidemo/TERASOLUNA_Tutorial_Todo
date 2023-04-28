@@ -75,12 +75,16 @@ public class TodoServiceImpl implements TodoService {
 		todoRepository.delete(todo);
 	}
 	
-	private Todo findOne(String todoId) {
-		return todoRepository.findById(todoId).orElseThrow(() -> {
-			ResultMessages messages = ResultMessages.error();
-			messages.add(ResultMessage.fromText("[E404] The requested Todo is not found. (id=" + todoId + ")"));
-			return new ResourceNotFoundException(messages);
-		});
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public Todo findOne(String todoId) {
+        return todoRepository.findById(todoId).orElseThrow(() -> {
+            ResultMessages messages = ResultMessages.error();
+            messages.add(ResultMessage
+                    .fromText("[E404] The requested Todo is not found. (id="
+                            + todoId + ")"));
+            return new ResourceNotFoundException(messages);
+        });
+    }
 
 }
